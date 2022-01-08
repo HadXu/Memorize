@@ -11,9 +11,9 @@ struct ContentView: View {
     var emojis = ["🚕","✈️","🛻","🛰","🚟","🚚","🚍","🚊","🚢","🚀","🚁","🎠",
                     "💾", "⚓️", "🪝", "🗼", "🏰", "🏝", "🏠","🚏", "⌚️","📱","📲","💻","⌨️"]
     
-    @State var emojiCount = 24
+    @State var emojiCount = 7
      
-    var body: some View {
+    var body:  some View {
         VStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
@@ -22,15 +22,7 @@ struct ContentView: View {
                     })
                 }
             }
-            .foregroundColor(.red) 
-            Spacer()
-            HStack {
-                remove
-                Spacer()
-                add
-            }
-            .font(.largeTitle)
-            .padding(.horizontal)
+            .foregroundColor(.red)
         } 
             .padding(.horizontal)
 
