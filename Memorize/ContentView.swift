@@ -30,8 +30,6 @@ struct ContentView: View {
         }
         .foregroundColor(.red)
         .padding(.horizontal)
-
-            
     }
     
     var remove: some View {

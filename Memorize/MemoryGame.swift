@@ -10,23 +10,33 @@ import Foundation
 struct MemoryGame<CardContent> where CardContent:Equatable {
     private(set) var cards : Array<Card>
     
-    private var iii : Int?
+    private var indexOfTheOneAndOnlyFaceUpCard : Int? {
+        get {
+            let faceUpCardIndices = cards.indices.filter({cards[$0].isFaceUp})
+            return faceUpCardIndices.oneAndOnly
+        }
+        set {
+            for index in cards.indices {
+                if index != newValue {
+                    cards[index].isFaceUp = false
+                } else {
+                    cards[index].isFaceUp = true
+                }
+            }
+        }
+    }
     
     mutating func choose(_ card: Card) {
         if let chosenIndex = cards.firstIndex(where: {$0.id == card.id}), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched {
-            if let pp = iii {
-                if cards[chosenIndex].content == cards[pp].content {
+            if let potenialMatchedIndex = indexOfTheOneAndOnlyFaceUpCard {
+                if cards[chosenIndex].content == cards[potenialMatchedIndex].content {
                     cards[chosenIndex].isMatched = true
-                    cards[pp].isMatched = true
+                    cards[potenialMatchedIndex].isMatched = true
                 }
-                iii = nil
+                cards[chosenIndex].isFaceUp = true
             }else{
-                for i in cards.indices {
-                    cards[i].isFaceUp = false
-                }
-                iii = chosenIndex
+                indexOfTheOneAndOnlyFaceUpCard = chosenIndex
             }
-            cards[chosenIndex].isFaceUp.toggle()
         }
         print("choosen card = \(cards)")
     }
@@ -38,6 +48,8 @@ struct MemoryGame<CardContent> where CardContent:Equatable {
             cards.append(Card(content: content, id:index * 2))
             cards.append(Card(content: content, id: index * 2 + 1))
         }
+        
+        cards.shuffle()
     }
     
     
@@ -47,5 +59,15 @@ struct MemoryGame<CardContent> where CardContent:Equatable {
         var content: CardContent
         
         var id: Int
+    }
+}
+
+extension Array {
+    var oneAndOnly:  Element? {
+        if self.count == 1 {
+            return self.first
+        } else {
+            return nil
+        }
     }
 }
