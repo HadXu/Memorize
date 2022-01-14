@@ -7,49 +7,25 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct EmojiMemoryGameView: View {
     
-    @ObservedObject var viewModel: EmojiMemoryGame 
+    @ObservedObject var game: EmojiMemoryGame
     
-    var emojis = ["🚕","✈️","🛻","🛰","🚟","🚚","🚍","🚊","🚢","🚀","🚁","🎠",
-                    "💾", "⚓️", "🪝", "🗼", "🏰", "🏝", "🏠","🚏", "⌚️","📱","📲","💻","⌨️"]
+    var emojis = ["🪝", "🚕","✈️","🛻","🛰","🚟","🚚","🚍","🚊","🚢","🚀","🚁","🎠",
+                    "💾", "⚓️", "🗼", "🏰", "🏝", "🏠","🚏", "⌚️","📱","📲","💻","⌨️"]
     
-    @State var emojiCount = 7
-     
     var body:  some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                ForEach(viewModel.cards) { card in
-                    CardView(card: card)
-                        .aspectRatio(2/3, contentMode: .fit)
-                        .onTapGesture {
-                            viewModel.choose(card)
-                        }
-                }
+        AspectVGrid(items: game.cards, aspectRatio: 2/3, content: { card in
+            if card.isMatched && !card.isFaceUp {
+                Rectangle().opacity(0)
+            } else {
+                CardView(card: card)
+                    .padding(4)
+                    .onTapGesture { game.choose(card) }
             }
-        }
+        } )
         .foregroundColor(.red)
         .padding(.horizontal)
-    }
-    
-    var remove: some View {
-        Button(action: {
-            if emojiCount > 1 {
-                emojiCount -= 1
-            }
-        }, label: {
-            Image(systemName: "minus.circle")
-        })
-    }
-    
-    var add: some View {
-        Button(action: {
-            if emojiCount < emojis.count {
-                emojiCount += 1
-            }
-        }, label: {
-            Image(systemName: "plus.circle")
-        })
     }
 }
 
@@ -62,6 +38,9 @@ struct CardView: View {
                 if card.isFaceUp  {
                     shape.fill().foregroundColor(.white)
                     shape.strokeBorder(lineWidth: DrawingConstants.linewidth)
+                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 130-90))
+                        .padding(5)
+                        .opacity(0.6)
                     Text(card.content).font(font(in: geometry.size))
                 }else if card.isMatched {
                     shape.opacity(0)
@@ -78,23 +57,18 @@ struct CardView: View {
     }
     
     private struct DrawingConstants {
-        static let cornerRadius: CGFloat = 20
+        static let cornerRadius: CGFloat = 15
         static let linewidth: CGFloat = 3
-        static let fontScale: CGFloat = 0.9
+        static let fontScale: CGFloat = 0.7
     }
 }
-
+ 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        
-        ContentView(viewModel: game)
-            .preferredColorScheme(.dark)
-.previewInterfaceOrientation(.portraitUpsideDown)
-        
-        ContentView(viewModel: game)
-            .preferredColorScheme(.light )
+        game.choose(game.cards.first!)
+        return EmojiMemoryGameView(game: game)
             
     } 
 }
